@@ -1,6 +1,39 @@
 dependencies:
+- name: alertmanager
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 1.13.1
+- name: grafana
+  repository: https://grafana.github.io/helm-charts
+  version: 8.8.2
 - name: grafana-operator
   repository: oci://ghcr.io/grafana/helm-charts
-  version: v5.14.0
-digest: sha256:3130008b45b129697075635b727a039e94117fe7bc898c758b1b746cc4708d80
-generated: "2024-10-28T17:18:03.420232+01:00"
+  version: v5.15.1
+- name: kube-prometheus-stack
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 67.5.0
+- name: kube-state-metrics
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 5.28.0
+- name: loki
+  repository: https://grafana.github.io/helm-charts
+  version: 6.24.0
+- name: mimir-distributed
+  repository: https://grafana.github.io/helm-charts
+  version: 5.5.1
+- name: prometheus
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 26.0.1
+- name: prometheus-blackbox-exporter
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 9.1.0
+- name: prometheus-node-exporter
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 4.43.1
+- name: promtail
+  repository: https://grafana.github.io/helm-charts
+  version: 6.16.6
+- name: tempo-distributed
+  repository: https://grafana.github.io/helm-charts
+  version: 1.28.0
+digest: sha256:2e98859c91d452739bfc9abe2d315443f5410038833ec97d2645fee025190d0f
+generated: "2024-12-31T11:27:18.119664638Z"

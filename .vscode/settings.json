@@ -29,11 +29,11 @@
     "Dockerfile.bash": "shellscript"
   },
   "files.readonlyInclude": {
-    ".terraform.lock.hcl": true,
+    "**/.terraform.lock.hcl": true,
     "**/*.gotmpl.*": true, // files rendered with Go
     "**/*.tftpl.*": true, // files rendered by Terraform
+    "**/Chart.lock": true,
     "bitbucket-pipelines.yml": true,
-    "Chart.lock": true,
     "third_party/helm/charts/**/*": true
   }
 }

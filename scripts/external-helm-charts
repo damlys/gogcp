@@ -7,6 +7,11 @@ function main {
   local registry="oci://europe-central2-docker.pkg.dev/gogke-main-0/external-helm-charts/gogcp"
 
   case "${cmd}" in
+  "format")
+    yq --inplace ".dependencies |= sort_by(.name)" ./third_party/helm/Chart.yaml
+    log::info "done"
+    ;;
+
   "download")
     rm -rf ./third_party/helm/charts/*
 
