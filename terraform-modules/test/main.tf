@@ -1,5 +1,5 @@
 module "test_platform" {
-  source = "gcs::https://www.googleapis.com/storage/v1/gogke-main-0-private-terraform-modules/gogke/gke-platform/0.0.2.zip"
+  source = "gcs::https://www.googleapis.com/storage/v1/gogke-main-0-private-terraform-modules/gogke/gke-platform/0.0.3.zip"
 
   google_client_config = data.google_client_config.oauth2
   google_project       = data.google_project.this
