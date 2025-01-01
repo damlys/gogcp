@@ -1,0 +1,15 @@
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: "{{ .Release.Name }}-kibana"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app.kubernetes.io/component: kibana
+    {{- include "eck-stack.metadataLabels" $ | nindent 4 }}
+  annotations:
+    eck.k8s.elastic.co/license: basic
+spec:
+  version: "{{ .Chart.AppVersion }}"
+  elasticsearchRef:
+    name: "{{ .Release.Name }}-elasticsearch"
+  {{- toYaml .Values.kibana.spec | nindent 2 }}

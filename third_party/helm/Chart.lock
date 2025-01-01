@@ -2,6 +2,9 @@ dependencies:
 - name: alertmanager
   repository: https://prometheus-community.github.io/helm-charts
   version: 1.13.1
+- name: eck-operator
+  repository: https://helm.elastic.co
+  version: 2.16.0
 - name: grafana
   repository: https://grafana.github.io/helm-charts
   version: 8.8.2
@@ -35,5 +38,5 @@ dependencies:
 - name: tempo-distributed
   repository: https://grafana.github.io/helm-charts
   version: 1.28.0
-digest: sha256:2e98859c91d452739bfc9abe2d315443f5410038833ec97d2645fee025190d0f
-generated: "2024-12-31T11:27:18.119664638Z"
+digest: sha256:c228248f5dc087adc9916ac93af3bc1e74d8f2ced1f2bfd87b58ec74a8b0b3cb
+generated: "2025-01-01T18:31:44.194303337Z"

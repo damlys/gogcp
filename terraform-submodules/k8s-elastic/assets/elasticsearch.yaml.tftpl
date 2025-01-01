@@ -1,0 +1,13 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: "{{ .Release.Name }}-elasticsearch"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app.kubernetes.io/component: elasticsearch
+    {{- include "eck-stack.metadataLabels" $ | nindent 4 }}
+  annotations:
+    eck.k8s.elastic.co/license: basic
+spec:
+  version: "{{ .Chart.AppVersion }}"
+  {{- toYaml .Values.elasticsearch.spec | nindent 2 }}
