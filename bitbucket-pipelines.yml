@@ -10,8 +10,8 @@ definitions:
     terraform-submodule-gke-platform: terraform-submodules/gke-platform/.terraform
     terraform-submodule-gke-service-account: terraform-submodules/gke-service-account/.terraform
     terraform-submodule-helm-release: terraform-submodules/helm-release/.terraform
-    terraform-submodule-k8s-elastic-stack: terraform-submodules/k8s-elastic-stack/.terraform
-    terraform-submodule-k8s-grafana-stack: terraform-submodules/k8s-grafana-stack/.terraform
+    terraform-submodule-k8s-elk-stack: terraform-submodules/k8s-elk-stack/.terraform
+    terraform-submodule-k8s-lgtm-stack: terraform-submodules/k8s-lgtm-stack/.terraform
     terraform-submodule-kuard: terraform-submodules/kuard/.terraform
     terraform-module-kuard: terraform-modules/kuard/.terraform
     terraform-module-main: terraform-modules/main/.terraform
@@ -430,62 +430,62 @@ definitions:
           - ./scripts/terraform-submodule test "helm-release"
           - ./scripts/terraform-submodule publish "helm-release"
           - ./scripts/terraform-submodule show "helm-release"
-    - step: &terraform-submodule-k8s-elastic-stack-test
-        name: test terraform-submodules/k8s-elastic-stack
+    - step: &terraform-submodule-k8s-elk-stack-test
+        name: test terraform-submodules/k8s-elk-stack
         condition:
           changesets:
             includePaths:
-              - "terraform-submodules/k8s-elastic-stack/**"
+              - "terraform-submodules/k8s-elk-stack/**"
         caches:
-          - terraform-submodule-k8s-elastic-stack
+          - terraform-submodule-k8s-elk-stack
         script:
           - *auth
-          - ./scripts/terraform-submodule build "k8s-elastic-stack"
-          - ./scripts/terraform-submodule test "k8s-elastic-stack"
-          - ./scripts/terraform-submodule pre-publish "k8s-elastic-stack"
-          - ./scripts/terraform-submodule show "k8s-elastic-stack"
-    - step: &terraform-submodule-k8s-elastic-stack-publish
-        name: publish terraform-submodules/k8s-elastic-stack
+          - ./scripts/terraform-submodule build "k8s-elk-stack"
+          - ./scripts/terraform-submodule test "k8s-elk-stack"
+          - ./scripts/terraform-submodule pre-publish "k8s-elk-stack"
+          - ./scripts/terraform-submodule show "k8s-elk-stack"
+    - step: &terraform-submodule-k8s-elk-stack-publish
+        name: publish terraform-submodules/k8s-elk-stack
         condition:
           changesets:
             includePaths:
-              - "terraform-submodules/k8s-elastic-stack/**"
+              - "terraform-submodules/k8s-elk-stack/**"
         caches:
-          - terraform-submodule-k8s-elastic-stack
+          - terraform-submodule-k8s-elk-stack
         script:
           - *auth
-          - ./scripts/terraform-submodule build "k8s-elastic-stack"
-          - ./scripts/terraform-submodule test "k8s-elastic-stack"
-          - ./scripts/terraform-submodule publish "k8s-elastic-stack"
-          - ./scripts/terraform-submodule show "k8s-elastic-stack"
-    - step: &terraform-submodule-k8s-grafana-stack-test
-        name: test terraform-submodules/k8s-grafana-stack
+          - ./scripts/terraform-submodule build "k8s-elk-stack"
+          - ./scripts/terraform-submodule test "k8s-elk-stack"
+          - ./scripts/terraform-submodule publish "k8s-elk-stack"
+          - ./scripts/terraform-submodule show "k8s-elk-stack"
+    - step: &terraform-submodule-k8s-lgtm-stack-test
+        name: test terraform-submodules/k8s-lgtm-stack
         condition:
           changesets:
             includePaths:
-              - "terraform-submodules/k8s-grafana-stack/**"
+              - "terraform-submodules/k8s-lgtm-stack/**"
         caches:
-          - terraform-submodule-k8s-grafana-stack
+          - terraform-submodule-k8s-lgtm-stack
         script:
           - *auth
-          - ./scripts/terraform-submodule build "k8s-grafana-stack"
-          - ./scripts/terraform-submodule test "k8s-grafana-stack"
-          - ./scripts/terraform-submodule pre-publish "k8s-grafana-stack"
-          - ./scripts/terraform-submodule show "k8s-grafana-stack"
-    - step: &terraform-submodule-k8s-grafana-stack-publish
-        name: publish terraform-submodules/k8s-grafana-stack
+          - ./scripts/terraform-submodule build "k8s-lgtm-stack"
+          - ./scripts/terraform-submodule test "k8s-lgtm-stack"
+          - ./scripts/terraform-submodule pre-publish "k8s-lgtm-stack"
+          - ./scripts/terraform-submodule show "k8s-lgtm-stack"
+    - step: &terraform-submodule-k8s-lgtm-stack-publish
+        name: publish terraform-submodules/k8s-lgtm-stack
         condition:
           changesets:
             includePaths:
-              - "terraform-submodules/k8s-grafana-stack/**"
+              - "terraform-submodules/k8s-lgtm-stack/**"
         caches:
-          - terraform-submodule-k8s-grafana-stack
+          - terraform-submodule-k8s-lgtm-stack
         script:
           - *auth
-          - ./scripts/terraform-submodule build "k8s-grafana-stack"
-          - ./scripts/terraform-submodule test "k8s-grafana-stack"
-          - ./scripts/terraform-submodule publish "k8s-grafana-stack"
-          - ./scripts/terraform-submodule show "k8s-grafana-stack"
+          - ./scripts/terraform-submodule build "k8s-lgtm-stack"
+          - ./scripts/terraform-submodule test "k8s-lgtm-stack"
+          - ./scripts/terraform-submodule publish "k8s-lgtm-stack"
+          - ./scripts/terraform-submodule show "k8s-lgtm-stack"
     - step: &terraform-submodule-kuard-test
         name: test terraform-submodules/kuard
         condition:
@@ -723,8 +723,8 @@ pipelines:
           - step: *terraform-submodule-gke-platform-test
           - step: *terraform-submodule-gke-service-account-test
           - step: *terraform-submodule-helm-release-test
-          - step: *terraform-submodule-k8s-elastic-stack-test
-          - step: *terraform-submodule-k8s-grafana-stack-test
+          - step: *terraform-submodule-k8s-elk-stack-test
+          - step: *terraform-submodule-k8s-lgtm-stack-test
           - step: *terraform-submodule-kuard-test
           - step: *terraform-module-kuard-validate
           - step: *terraform-module-main-validate
@@ -754,8 +754,8 @@ pipelines:
           - step: *terraform-submodule-gke-platform-publish
           - step: *terraform-submodule-gke-service-account-publish
           - step: *terraform-submodule-helm-release-publish
-          - step: *terraform-submodule-k8s-elastic-stack-publish
-          - step: *terraform-submodule-k8s-grafana-stack-publish
+          - step: *terraform-submodule-k8s-elk-stack-publish
+          - step: *terraform-submodule-k8s-lgtm-stack-publish
           - step: *terraform-submodule-kuard-publish
       - parallel:
           - step: *terraform-module-kuard-plan

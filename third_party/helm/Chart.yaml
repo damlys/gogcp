@@ -2,10 +2,6 @@ apiVersion: v2
 name: noname
 version: 0.0.0
 dependencies:
-  - # https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager
-    repository: https://prometheus-community.github.io/helm-charts
-    name: alertmanager
-    version: 1.13.1
   - # https://github.com/elastic/cloud-on-k8s/tree/main/deploy/eck-operator
     repository: https://helm.elastic.co
     name: eck-operator
@@ -14,18 +10,6 @@ dependencies:
     repository: https://grafana.github.io/helm-charts
     name: grafana
     version: 8.8.2
-  - # https://github.com/grafana/grafana-operator/tree/master/deploy/helm/grafana-operator
-    repository: oci://ghcr.io/grafana/helm-charts
-    name: grafana-operator
-    version: v5.15.1
-  - # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
-    repository: https://prometheus-community.github.io/helm-charts
-    name: kube-prometheus-stack
-    version: 67.5.0
-  - # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics
-    repository: https://prometheus-community.github.io/helm-charts
-    name: kube-state-metrics
-    version: 5.28.0
   - # https://github.com/grafana/loki/tree/main/production/helm/loki
     repository: https://grafana.github.io/helm-charts
     name: loki
@@ -38,22 +22,6 @@ dependencies:
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     name: opentelemetry-operator
     version: 0.76.0
-  - # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus
-    repository: https://prometheus-community.github.io/helm-charts
-    name: prometheus
-    version: 26.0.1
-  - # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-blackbox-exporter
-    repository: https://prometheus-community.github.io/helm-charts
-    name: prometheus-blackbox-exporter
-    version: 9.1.0
-  - # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
-    repository: https://prometheus-community.github.io/helm-charts
-    name: prometheus-node-exporter
-    version: 4.43.1
-  - # https://github.com/grafana/helm-charts/tree/main/charts/promtail
-    repository: https://grafana.github.io/helm-charts
-    name: promtail
-    version: 6.16.6
   - # https://github.com/grafana/helm-charts/tree/main/charts/tempo-distributed
     repository: https://grafana.github.io/helm-charts
     name: tempo-distributed

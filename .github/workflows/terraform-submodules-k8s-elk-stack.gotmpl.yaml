@@ -1,0 +1,54 @@
+name: terraform-submodules/k8s-elk-stack
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/terraform-submodules-k8s-elk-stack.gotmpl.yaml"
+      - "terraform-submodules/k8s-elk-stack/**"
+      - "!terraform-submodules/k8s-elk-stack/README.md"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/terraform-submodules-k8s-elk-stack.gotmpl.yaml"
+      - "terraform-submodules/k8s-elk-stack/**"
+      - "!terraform-submodules/k8s-elk-stack/README.md"
+jobs:
+  terraform-submodules-k8s-elk-stack:
+    name: terraform-submodules/k8s-elk-stack
+    runs-on: ubuntu-24.04
+    container: ghcr.io/damlys/gogcp-devcontainer:0.0.1
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      TF_IN_AUTOMATION: 1
+    steps:
+      - name: git clone
+        uses: actions/checkout@v4
+      - name: git clone fix
+        run: git config --system --add safe.directory /__w/gogcp/gogcp
+      - name: gcloud auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+          create_credentials_file: true
+          cleanup_credentials: true
+      - name: cache
+        uses: actions/cache@v4
+        with:
+          key: terraform-submodules-k8s-elk-stack
+          path: |
+            terraform-submodules/k8s-elk-stack/.terraform
+            terraform-submodules/k8s-elk-stack/.terraform.lock.hcl
+      - name: build
+        run: ./scripts/terraform-submodule build "k8s-elk-stack"
+      - name: test
+        run: ./scripts/terraform-submodule test "k8s-elk-stack"
+      - if: github.event_name == 'pull_request' && github.ref == 'refs/heads/main'
+        name: pre-publish
+        run: ./scripts/terraform-submodule pre-publish "k8s-elk-stack"
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        name: publish
+        run: ./scripts/terraform-submodule publish "k8s-elk-stack"
+      - name: show
+        run: ./scripts/terraform-submodule show "k8s-elk-stack"
