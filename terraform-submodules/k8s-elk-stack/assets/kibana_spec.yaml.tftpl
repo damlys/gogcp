@@ -3,6 +3,8 @@ count: 1
 config:
   server.publicBaseUrl: "https://${kibana_domain}"
 podTemplate:
+  metadata:
+    creationTimestamp: null # bug: kubernetes_manifest plan shows changes without this line
   spec:
     containers:
       - name: kibana

@@ -29,24 +29,3 @@ datasources:
         type: tempo
         url: http://tempo-query.lgtm-tempo.svc.cluster.local:16686
         access: proxy
-      - name: GCP logs
-        type: googlecloud-logging-datasource # Google Cloud Logging: https://github.com/GoogleCloudPlatform/cloud-logging-data-source-plugin
-        access: proxy
-        jsonData:
-          authenticationType: gce # required IAM roles: "roles/logging.viewer", "roles/logging.viewAccessor"
-      - name: GCP metrics
-        type: stackdriver # Google Cloud Monitoring: https://grafana.com/docs/grafana/latest/datasources/google-cloud-monitoring/
-        access: proxy
-        jsonData:
-          authenticationType: gce # required IAM roles: "roles/monitoring.viewer"
-          # TODO
-          defaultProject: gogke-test-0
-      - name: GCP traces
-        type: googlecloud-trace-datasource # Google Cloud Trace: https://github.com/GoogleCloudPlatform/cloud-trace-data-source-plugin
-        access: proxy
-        jsonData:
-          authenticationType: gce # required IAM roles: "roles/cloudtrace.user"
-
-plugins:
-  - googlecloud-logging-datasource
-  - googlecloud-trace-datasource

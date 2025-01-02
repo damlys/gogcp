@@ -41,14 +41,14 @@ resource "helm_release" "eck_operator" {
 ### ...
 #######################################
 
-module "test_elk_stack" {
-  depends_on = [
-    helm_release.eck_operator,
-  ]
-  source = "../../terraform-submodules/k8s-elk-stack"
+# module "test_elk_stack" {
+#   depends_on = [
+#     helm_release.eck_operator,
+#   ]
+#   source = "../../terraform-submodules/k8s-elk-stack"
 
-  kibana_domain = "kibana.gogke-test-7.damlys.pl"
-}
+#   kibana_domain = "kibana.gogke-test-7.damlys.pl"
+# }
 
 module "test_lgtm_stack" {
   source = "../../terraform-submodules/k8s-lgtm-stack"
