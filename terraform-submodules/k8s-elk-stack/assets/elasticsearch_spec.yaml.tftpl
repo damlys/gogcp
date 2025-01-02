@@ -1,0 +1,60 @@
+version: "${version}"
+nodeSets:
+  - name: default
+    count: 1
+    config:
+      http.host: 0.0.0.0
+    podTemplate:
+      spec:
+        initContainers:
+          - # https://www.elastic.co/guide/en/cloud-on-k8s/2.16/k8s-virtual-memory.html
+            name: sysctl
+            securityContext:
+              privileged: true
+              runAsUser: 0
+            command: ["sh", "-c", "sysctl -w vm.max_map_count=262144"]
+            resources:
+              requests:
+                cpu: 25m
+                memory: 32Mi
+              limits:
+                cpu: 200m
+                memory: 256Mi
+          - # prevent permissions errors
+            name: chown
+            securityContext:
+              runAsUser: 0
+            command: ["sh", "-c", "chown -R elasticsearch:elasticsearch /usr/share/elasticsearch/data"]
+            resources:
+              requests:
+                cpu: 25m
+                memory: 32Mi
+              limits:
+                cpu: 200m
+                memory: 256Mi
+        containers:
+          - name: elasticsearch
+            resources:
+              requests:
+                cpu: 100m
+                memory: 1Gi
+              limits:
+                cpu: 500m
+                memory: 2Gi
+        volumeClaimTemplates:
+          - # https://www.elastic.co/guide/en/cloud-on-k8s/2.16/k8s-volume-claim-templates.html
+            metadata:
+              name: elasticsearch-data
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 10Gi
+              storageClassName: standard
+volumeClaimDeletePolicy: DeleteOnScaledownAndClusterDeletion
+
+http:
+  tls:
+    selfSignedCertificate:
+      disabled: true

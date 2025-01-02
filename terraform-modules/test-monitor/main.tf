@@ -38,24 +38,20 @@ resource "helm_release" "eck_operator" {
 }
 
 #######################################
-### Elastic stack
+### ...
 #######################################
 
-module "test_elastic_stack" {
+module "test_elk_stack" {
   depends_on = [
     helm_release.eck_operator,
   ]
-  source = "../../terraform-submodules/k8s-elastic-stack"
+  source = "../../terraform-submodules/k8s-elk-stack"
 
   kibana_domain = "kibana.gogke-test-7.damlys.pl"
 }
 
-#######################################
-### Grafana stack
-#######################################
-
-module "test_grafana_stack" {
-  source = "../../terraform-submodules/k8s-grafana-stack"
+module "test_lgtm_stack" {
+  source = "../../terraform-submodules/k8s-lgtm-stack"
 
   grafana_domain = "grafana.gogke-test-7.damlys.pl"
 }

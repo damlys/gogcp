@@ -1,0 +1,12 @@
+version: "${version}"
+count: 1
+config:
+  server.publicBaseUrl: "https://${kibana_domain}"
+elasticsearchRef:
+  name: "${elasticsearch_name}"
+  namespace: "${elasticsearch_namespace}"
+
+http:
+  tls:
+    selfSignedCertificate:
+      disabled: true
