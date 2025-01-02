@@ -10,11 +10,14 @@ definitions:
     terraform-submodule-gke-platform: terraform-submodules/gke-platform/.terraform
     terraform-submodule-gke-service-account: terraform-submodules/gke-service-account/.terraform
     terraform-submodule-helm-release: terraform-submodules/helm-release/.terraform
+    terraform-submodule-k8s-elastic-stack: terraform-submodules/k8s-elastic-stack/.terraform
+    terraform-submodule-k8s-grafana-stack: terraform-submodules/k8s-grafana-stack/.terraform
     terraform-submodule-kuard: terraform-submodules/kuard/.terraform
     terraform-module-kuard: terraform-modules/kuard/.terraform
     terraform-module-main: terraform-modules/main/.terraform
     terraform-module-prod: terraform-modules/prod/.terraform
     terraform-module-test: terraform-modules/test/.terraform
+    terraform-module-test-monitor: terraform-modules/test-monitor/.terraform
   scripts:
     - &auth |
       set -e
@@ -427,6 +430,62 @@ definitions:
           - ./scripts/terraform-submodule test "helm-release"
           - ./scripts/terraform-submodule publish "helm-release"
           - ./scripts/terraform-submodule show "helm-release"
+    - step: &terraform-submodule-k8s-elastic-stack-test
+        name: test terraform-submodules/k8s-elastic-stack
+        condition:
+          changesets:
+            includePaths:
+              - "terraform-submodules/k8s-elastic-stack/**"
+        caches:
+          - terraform-submodule-k8s-elastic-stack
+        script:
+          - *auth
+          - ./scripts/terraform-submodule build "k8s-elastic-stack"
+          - ./scripts/terraform-submodule test "k8s-elastic-stack"
+          - ./scripts/terraform-submodule pre-publish "k8s-elastic-stack"
+          - ./scripts/terraform-submodule show "k8s-elastic-stack"
+    - step: &terraform-submodule-k8s-elastic-stack-publish
+        name: publish terraform-submodules/k8s-elastic-stack
+        condition:
+          changesets:
+            includePaths:
+              - "terraform-submodules/k8s-elastic-stack/**"
+        caches:
+          - terraform-submodule-k8s-elastic-stack
+        script:
+          - *auth
+          - ./scripts/terraform-submodule build "k8s-elastic-stack"
+          - ./scripts/terraform-submodule test "k8s-elastic-stack"
+          - ./scripts/terraform-submodule publish "k8s-elastic-stack"
+          - ./scripts/terraform-submodule show "k8s-elastic-stack"
+    - step: &terraform-submodule-k8s-grafana-stack-test
+        name: test terraform-submodules/k8s-grafana-stack
+        condition:
+          changesets:
+            includePaths:
+              - "terraform-submodules/k8s-grafana-stack/**"
+        caches:
+          - terraform-submodule-k8s-grafana-stack
+        script:
+          - *auth
+          - ./scripts/terraform-submodule build "k8s-grafana-stack"
+          - ./scripts/terraform-submodule test "k8s-grafana-stack"
+          - ./scripts/terraform-submodule pre-publish "k8s-grafana-stack"
+          - ./scripts/terraform-submodule show "k8s-grafana-stack"
+    - step: &terraform-submodule-k8s-grafana-stack-publish
+        name: publish terraform-submodules/k8s-grafana-stack
+        condition:
+          changesets:
+            includePaths:
+              - "terraform-submodules/k8s-grafana-stack/**"
+        caches:
+          - terraform-submodule-k8s-grafana-stack
+        script:
+          - *auth
+          - ./scripts/terraform-submodule build "k8s-grafana-stack"
+          - ./scripts/terraform-submodule test "k8s-grafana-stack"
+          - ./scripts/terraform-submodule publish "k8s-grafana-stack"
+          - ./scripts/terraform-submodule show "k8s-grafana-stack"
     - step: &terraform-submodule-kuard-test
         name: test terraform-submodules/kuard
         condition:
@@ -607,6 +666,44 @@ definitions:
           - terraform -chdir="terraform-modules/test" init -input="false"
           - terraform -chdir="terraform-modules/test" apply -input="false" -auto-approve
         trigger: manual
+    - step: &terraform-module-test-monitor-validate
+        name: validate terraform-modules/test-monitor
+        condition:
+          changesets:
+            includePaths:
+              - "terraform-modules/test-monitor/**"
+        caches:
+          - terraform-module-test-monitor
+        script:
+          - *auth
+          - ./scripts/terraform-module test "test-monitor"
+          - terraform -chdir="terraform-modules/test-monitor" init -input="false"
+          - terraform -chdir="terraform-modules/test-monitor" validate
+    - step: &terraform-module-test-monitor-plan
+        name: plan terraform-modules/test-monitor
+        condition:
+          changesets:
+            includePaths:
+              - "terraform-modules/test-monitor/**"
+        caches:
+          - terraform-module-test-monitor
+        script:
+          - *auth
+          - terraform -chdir="terraform-modules/test-monitor" init -input="false"
+          - terraform -chdir="terraform-modules/test-monitor" plan -input="false"
+    - step: &terraform-module-test-monitor-apply
+        name: apply terraform-modules/test-monitor
+        condition:
+          changesets:
+            includePaths:
+              - "terraform-modules/test-monitor/**"
+        caches:
+          - terraform-module-test-monitor
+        script:
+          - *auth
+          - terraform -chdir="terraform-modules/test-monitor" init -input="false"
+          - terraform -chdir="terraform-modules/test-monitor" apply -input="false" -auto-approve
+        trigger: manual
 
 pipelines:
   pull-requests:
@@ -626,16 +723,20 @@ pipelines:
           - step: *terraform-submodule-gke-platform-test
           - step: *terraform-submodule-gke-service-account-test
           - step: *terraform-submodule-helm-release-test
+          - step: *terraform-submodule-k8s-elastic-stack-test
+          - step: *terraform-submodule-k8s-grafana-stack-test
           - step: *terraform-submodule-kuard-test
           - step: *terraform-module-kuard-validate
           - step: *terraform-module-main-validate
           - step: *terraform-module-prod-validate
           - step: *terraform-module-test-validate
+          - step: *terraform-module-test-monitor-validate
       - parallel:
           - step: *terraform-module-kuard-plan
           - step: *terraform-module-main-plan
           - step: *terraform-module-prod-plan
           - step: *terraform-module-test-plan
+          - step: *terraform-module-test-monitor-plan
   branches:
     main:
       - parallel:
@@ -653,14 +754,18 @@ pipelines:
           - step: *terraform-submodule-gke-platform-publish
           - step: *terraform-submodule-gke-service-account-publish
           - step: *terraform-submodule-helm-release-publish
+          - step: *terraform-submodule-k8s-elastic-stack-publish
+          - step: *terraform-submodule-k8s-grafana-stack-publish
           - step: *terraform-submodule-kuard-publish
       - parallel:
           - step: *terraform-module-kuard-plan
           - step: *terraform-module-main-plan
           - step: *terraform-module-prod-plan
           - step: *terraform-module-test-plan
+          - step: *terraform-module-test-monitor-plan
       - parallel:
           - step: *terraform-module-kuard-apply
           - step: *terraform-module-main-apply
           - step: *terraform-module-prod-apply
           - step: *terraform-module-test-apply
+          - step: *terraform-module-test-monitor-apply
