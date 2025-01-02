@@ -8,6 +8,8 @@ $ ./scripts/external-helm-charts push
 
 Sources:
 
+- https://github.com/elastic/cloud-on-k8s/tree/main/deploy
+- https://github.com/elastic/helm-charts
 - https://github.com/grafana/grafana-operator/tree/master/deploy/helm
 - https://github.com/grafana/helm-charts/tree/main/charts
 - https://github.com/grafana/loki/tree/main/production/helm
