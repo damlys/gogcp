@@ -15,7 +15,7 @@ resource "helm_release" "otel_operator" {
 
   namespace = kubernetes_namespace.otel_operator.metadata[0].name
   name      = "opentelemetry-operator"
-  values    = [file("${path.module}/assets/helm_release.otel_operator.yaml")]
+  values    = [file("${path.module}/assets/otel_operator.yaml")]
 }
 
 #######################################

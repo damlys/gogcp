@@ -16,7 +16,7 @@ resource "kubernetes_namespace" "grafana" {
 #   namespace = kubernetes_namespace.grafana.metadata[0].name
 #   name      = "grafana"
 
-#   values = [templatefile("${path.module}/assets/helm_release.grafana.yaml.tftpl", {
+#   values = [templatefile("${path.module}/assets/grafana.yaml.tftpl", {
 #     grafana_domain = var.grafana_domain,
 #   })]
 # }
@@ -39,7 +39,7 @@ resource "kubernetes_namespace" "loki" {
 #   namespace = kubernetes_namespace.loki.metadata[0].name
 #   name      = "loki"
 
-#   values = [templatefile("${path.module}/assets/helm_release.loki.yaml.tftpl", {
+#   values = [templatefile("${path.module}/assets/loki.yaml.tftpl", {
 #   })]
 # }
 
@@ -61,7 +61,7 @@ resource "kubernetes_namespace" "mimir" {
 #   namespace = kubernetes_namespace.mimir.metadata[0].name
 #   name      = "mimir"
 
-#   values = [templatefile("${path.module}/assets/helm_release.mimir.yaml.tftpl", {
+#   values = [templatefile("${path.module}/assets/mimir.yaml.tftpl", {
 #   })]
 # }
 
@@ -83,6 +83,6 @@ resource "kubernetes_namespace" "tempo" {
 #   namespace = kubernetes_namespace.tempo.metadata[0].name
 #   name      = "tempo"
 
-#   values = [templatefile("${path.module}/assets/helm_release.tempo.yaml.tftpl", {
+#   values = [templatefile("${path.module}/assets/tempo.yaml.tftpl", {
 #   })]
 # }
