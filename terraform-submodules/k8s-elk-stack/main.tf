@@ -67,6 +67,10 @@ resource "kubernetes_manifest" "kibana" {
       elasticsearch_namespace = kubernetes_manifest.elasticsearch.manifest.metadata.namespace
     }))
   }
+
+  field_manager {
+    force_conflicts = true
+  }
 }
 
 resource "kubernetes_manifest" "kibana_httproute" {

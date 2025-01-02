@@ -2,11 +2,23 @@ version: "${version}"
 count: 1
 config:
   server.publicBaseUrl: "https://${kibana_domain}"
-elasticsearchRef:
-  name: "${elasticsearch_name}"
-  namespace: "${elasticsearch_namespace}"
+podTemplate:
+  spec:
+    containers:
+      - name: kibana
+        resources:
+          requests:
+            cpu: 75m
+            memory: 512Mi
+          limits:
+            cpu: 300m
+            memory: 2Gi
 
 http:
   tls:
     selfSignedCertificate:
       disabled: true
+
+elasticsearchRef:
+  name: "${elasticsearch_name}"
+  namespace: "${elasticsearch_namespace}"
