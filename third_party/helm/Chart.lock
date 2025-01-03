@@ -1,6 +1,9 @@
 dependencies:
-- name: grafana-operator
-  repository: oci://ghcr.io/grafana/helm-charts
-  version: v5.14.0
-digest: sha256:3130008b45b129697075635b727a039e94117fe7bc898c758b1b746cc4708d80
-generated: "2024-10-28T17:18:03.420232+01:00"
+- name: eck-operator
+  repository: https://helm.elastic.co
+  version: 2.16.0
+- name: opentelemetry-operator
+  repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+  version: 0.76.0
+digest: sha256:ee161c975aec967b1ff140d98d105cf8166999bea6504204c5ecaf12b4699180
+generated: "2025-01-03T11:04:08.643888167Z"

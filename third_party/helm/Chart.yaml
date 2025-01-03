@@ -1,8 +1,12 @@
 apiVersion: v2
-name: none
+name: noname
 version: 0.0.0
 dependencies:
-  - # https://github.com/grafana/grafana-operator
-    repository: oci://ghcr.io/grafana/helm-charts
-    name: grafana-operator
-    version: v5.14.0
+  - # https://github.com/elastic/cloud-on-k8s/tree/main/deploy/eck-operator
+    repository: https://helm.elastic.co
+    name: eck-operator
+    version: 2.16.0
+  - # https://github.com/open-telemetry/opentelemetry-helm-charts/tree/main/charts/opentelemetry-operator
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+    name: opentelemetry-operator
+    version: 0.76.0
