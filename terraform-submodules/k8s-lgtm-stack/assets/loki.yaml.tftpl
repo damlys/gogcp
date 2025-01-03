@@ -1,6 +1,17 @@
 loki:
   auth_enabled: false
 
+  # https://grafana.com/docs/loki/latest/operations/storage/schema/
+  schemaConfig:
+    configs:
+      - from: 1970-01-01
+        object_store: s3
+        store: tsdb
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
+
 minio:
   enabled: true
   persistence:
