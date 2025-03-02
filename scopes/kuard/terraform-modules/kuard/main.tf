@@ -11,17 +11,17 @@ resource "kubernetes_resource_quota" "pods" {
   }
   spec {
     hard = {
-      pods = 3
+      pods = 4
     }
   }
 }
 
 module "this" {
-  source = "../../terraform-submodules/kuard" # "gcs::https://www.googleapis.com/storage/v1/gogke-main-0-private-terraform-modules/gogke/kuard/kuard/0.1.1.zip"
+  source = "../../terraform-submodules/kuard" # "gcs::https://www.googleapis.com/storage/v1/gogke-main-0-private-terraform-modules/gogke/kuard/kuard/0.1.2.zip"
 
   google_project           = data.google_project.this
   google_container_cluster = data.google_container_cluster.this
   kubernetes_namespace     = data.kubernetes_namespace.this
 
-  domain = "kuard.gogke-test-7.damlys.pl"
+  platform_domain = "gogke-test-7.damlys.pl"
 }

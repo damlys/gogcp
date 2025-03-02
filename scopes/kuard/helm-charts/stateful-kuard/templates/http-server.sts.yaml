@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}-http-server"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app.kubernetes.io/component: http-server
+    {{- include "kuard.metadataLabels" $ | nindent 4 }}
+spec:
+  serviceName: "{{ .Release.Name }}-http-server-headless"
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: http-server
+      {{- include "kuard.selectorLabels" $ | nindent 6 }}
+  replicas: {{ .Values.httpServer.replicas }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.httpServer.maxUnavailable }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: http-server
+        {{- include "kuard.metadataLabels" $ | nindent 8 }}
+      annotations:
+        checksum/configs: "{{ include "kuard.configsChecksum" $ }}"
+        instrumentation.opentelemetry.io/otel-go-auto-target-exe: /kuard
+        {{- if .Values.httpServer.podAnnotations }}
+        {{- toYaml .Values.httpServer.podAnnotations | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.serviceAccountName }}
+      serviceAccountName: "{{ .Values.serviceAccountName }}"
+      {{- end }}
+      initContainers:
+        - name: chown-data
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["chown"]
+          args: ["-R", "1000:3000", "/var/lib/kuard"]
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/kuard
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 32Mi
+          securityContext: # container security context
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - FOWNER
+            runAsNonRoot: false
+            readOnlyRootFilesystem: false
+            runAsUser: 0
+            runAsGroup: 0
+      containers:
+        - name: http-server
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          envFrom:
+            - configMapRef:
+                name: "{{ .Release.Name }}-config-envs"
+            - secretRef:
+                name: "{{ .Release.Name }}-config-envs"
+          volumeMounts:
+            - name: config-files
+              mountPath: /run/secrets/kuard
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/kuard
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              port: http
+              path: /healthy
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /ready
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /healthy
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext: # container security context
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            runAsUser: 1000
+            runAsGroup: 3000
+      securityContext: # pod security context
+        fsGroup: 2000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: http-server
+                    {{- include "kuard.selectorLabels" $ | nindent 20 }}
+                topologyKey: kubernetes.io/hostname
+      volumes:
+        - name: config-files
+          projected:
+            sources:
+              - configMap:
+                  name: "{{ .Release.Name }}-config-files"
+              - secret:
+                  name: "{{ .Release.Name }}-config-files"
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        storageClassName: standard-rwo
+        accessModes:
+          - ReadWriteOncePod
+        resources:
+          requests:
+            storage: 1Gi

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-http-server-headless"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app.kubernetes.io/component: http-server
+    {{- include "kuard.metadataLabels" $ | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/component: http-server
+    {{- include "kuard.selectorLabels" $ | nindent 4 }}
+  type: ClusterIP
+  clusterIP: None # headless service
+  publishNotReadyAddresses: false
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http

@@ -19,6 +19,6 @@ variable "kubernetes_namespace" {
   })
 }
 
-variable "domain" {
+variable "platform_domain" {
   type = string
 }

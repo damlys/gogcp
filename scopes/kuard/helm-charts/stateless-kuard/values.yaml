@@ -1,0 +1,16 @@
+image:
+  repository: europe-central2-docker.pkg.dev/gogke-main-0/private-docker-images/gogke/kuard/kuard
+  tag: 0.1.0
+
+serviceAccountName: ""
+
+configEnvs: {}
+secretConfigEnvs: {}
+configFiles: {}
+secretConfigFiles: {}
+
+httpServer:
+  minReplicas: 1
+  maxReplicas: 1
+  maxUnavailable: 1
+  podAnnotations: {}

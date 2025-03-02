@@ -1,18 +1,18 @@
-name: scopes/kuard/helm-charts/kuard
+name: scopes/kuard/helm-charts/stateless-kuard
 on:
   pull_request:
     paths:
-      - "scopes/kuard/helm-charts/kuard/**"
-      - "!scopes/kuard/helm-charts/kuard/README.md"
+      - "scopes/kuard/helm-charts/stateless-kuard/**"
+      - "!scopes/kuard/helm-charts/stateless-kuard/README.md"
   push:
     branches:
       - main
     paths:
-      - "scopes/kuard/helm-charts/kuard/**"
-      - "!scopes/kuard/helm-charts/kuard/README.md"
+      - "scopes/kuard/helm-charts/stateless-kuard/**"
+      - "!scopes/kuard/helm-charts/stateless-kuard/README.md"
 jobs:
-  scopes-kuard-helm-charts-kuard:
-    name: scopes/kuard/helm-charts/kuard
+  scopes-kuard-helm-charts-stateless-kuard:
+    name: scopes/kuard/helm-charts/stateless-kuard
     runs-on: ubuntu-24.04
     container: ghcr.io/damlys/gogcp-devcontainer:0.1.0
     permissions:
@@ -24,7 +24,7 @@ jobs:
       - name: git clone
         uses: actions/checkout@v4
       - name: git clone fix
-        run: git config --system --add safe.directory /__w/gogcp/gogcp
+        run: git config --system --add safe.directory /__w/gorun/gorun
       - name: gcloud auth
         uses: google-github-actions/auth@v2
         with:
@@ -34,14 +34,14 @@ jobs:
       - name: helm auth (Google Artifact Registry)
         run: gcloud auth print-access-token | helm registry login --username="oauth2accesstoken" --password-stdin "europe-central2-docker.pkg.dev"
       - name: build
-        run: ./scripts/helm-chart build "scopes/kuard/helm-charts/kuard"
+        run: ./scripts/helm-chart build "scopes/kuard/helm-charts/stateless-kuard"
       - name: test
-        run: ./scripts/helm-chart test "scopes/kuard/helm-charts/kuard"
+        run: ./scripts/helm-chart test "scopes/kuard/helm-charts/stateless-kuard"
       - if: github.event_name == 'pull_request' && github.ref == 'refs/heads/main'
         name: pre-publish
-        run: ./scripts/helm-chart pre-publish "scopes/kuard/helm-charts/kuard"
+        run: ./scripts/helm-chart pre-publish "scopes/kuard/helm-charts/stateless-kuard"
       - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         name: publish
-        run: ./scripts/helm-chart publish "scopes/kuard/helm-charts/kuard"
+        run: ./scripts/helm-chart publish "scopes/kuard/helm-charts/stateless-kuard"
       - name: show
-        run: ./scripts/helm-chart show "scopes/kuard/helm-charts/kuard"
+        run: ./scripts/helm-chart show "scopes/kuard/helm-charts/stateless-kuard"

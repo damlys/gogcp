@@ -1,0 +1,14 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: "{{ .Release.Name }}-http-server"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app.kubernetes.io/component: http-server
+    {{- include "kuard.metadataLabels" $ | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: http-server
+      {{- include "kuard.selectorLabels" $ | nindent 6 }}
+  maxUnavailable: {{ .Values.httpServer.maxUnavailable }}

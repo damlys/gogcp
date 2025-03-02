@@ -516,30 +516,54 @@ definitions:
           - ./scripts/docker-image test "scopes/kuard/docker-images/kuard"
           - ./scripts/docker-image publish "scopes/kuard/docker-images/kuard"
           - ./scripts/docker-image show "scopes/kuard/docker-images/kuard"
-    - step: &test-scopes-kuard-helm-charts-kuard
-        name: test scopes/kuard/helm-charts/kuard
+    - step: &test-scopes-kuard-helm-charts-stateful-kuard
+        name: test scopes/kuard/helm-charts/stateful-kuard
         condition:
           changesets:
             includePaths:
-              - "scopes/kuard/helm-charts/kuard/**"
+              - "scopes/kuard/helm-charts/stateful-kuard/**"
         script:
           - *auth
-          - ./scripts/helm-chart build "scopes/kuard/helm-charts/kuard"
-          - ./scripts/helm-chart test "scopes/kuard/helm-charts/kuard"
-          - ./scripts/helm-chart pre-publish "scopes/kuard/helm-charts/kuard"
-          - ./scripts/helm-chart show "scopes/kuard/helm-charts/kuard"
-    - step: &publish-scopes-kuard-helm-charts-kuard
-        name: publish scopes/kuard/helm-charts/kuard
+          - ./scripts/helm-chart build "scopes/kuard/helm-charts/stateful-kuard"
+          - ./scripts/helm-chart test "scopes/kuard/helm-charts/stateful-kuard"
+          - ./scripts/helm-chart pre-publish "scopes/kuard/helm-charts/stateful-kuard"
+          - ./scripts/helm-chart show "scopes/kuard/helm-charts/stateful-kuard"
+    - step: &publish-scopes-kuard-helm-charts-stateful-kuard
+        name: publish scopes/kuard/helm-charts/stateful-kuard
         condition:
           changesets:
             includePaths:
-              - "scopes/kuard/helm-charts/kuard/**"
+              - "scopes/kuard/helm-charts/stateful-kuard/**"
         script:
           - *auth
-          - ./scripts/helm-chart build "scopes/kuard/helm-charts/kuard"
-          - ./scripts/helm-chart test "scopes/kuard/helm-charts/kuard"
-          - ./scripts/helm-chart publish "scopes/kuard/helm-charts/kuard"
-          - ./scripts/helm-chart show "scopes/kuard/helm-charts/kuard"
+          - ./scripts/helm-chart build "scopes/kuard/helm-charts/stateful-kuard"
+          - ./scripts/helm-chart test "scopes/kuard/helm-charts/stateful-kuard"
+          - ./scripts/helm-chart publish "scopes/kuard/helm-charts/stateful-kuard"
+          - ./scripts/helm-chart show "scopes/kuard/helm-charts/stateful-kuard"
+    - step: &test-scopes-kuard-helm-charts-stateless-kuard
+        name: test scopes/kuard/helm-charts/stateless-kuard
+        condition:
+          changesets:
+            includePaths:
+              - "scopes/kuard/helm-charts/stateless-kuard/**"
+        script:
+          - *auth
+          - ./scripts/helm-chart build "scopes/kuard/helm-charts/stateless-kuard"
+          - ./scripts/helm-chart test "scopes/kuard/helm-charts/stateless-kuard"
+          - ./scripts/helm-chart pre-publish "scopes/kuard/helm-charts/stateless-kuard"
+          - ./scripts/helm-chart show "scopes/kuard/helm-charts/stateless-kuard"
+    - step: &publish-scopes-kuard-helm-charts-stateless-kuard
+        name: publish scopes/kuard/helm-charts/stateless-kuard
+        condition:
+          changesets:
+            includePaths:
+              - "scopes/kuard/helm-charts/stateless-kuard/**"
+        script:
+          - *auth
+          - ./scripts/helm-chart build "scopes/kuard/helm-charts/stateless-kuard"
+          - ./scripts/helm-chart test "scopes/kuard/helm-charts/stateless-kuard"
+          - ./scripts/helm-chart publish "scopes/kuard/helm-charts/stateless-kuard"
+          - ./scripts/helm-chart show "scopes/kuard/helm-charts/stateless-kuard"
     - step: &validate-scopes-kuard-terraform-modules-kuard
         name: validate scopes/kuard/terraform-modules/kuard
         condition:
@@ -773,7 +797,8 @@ pipelines:
           - step: *test-scopes-core-terraform-submodules-gke-platform
           - step: *test-scopes-core-terraform-submodules-gke-service-account
           - step: *test-scopes-kuard-docker-images-kuard
-          - step: *test-scopes-kuard-helm-charts-kuard
+          - step: *test-scopes-kuard-helm-charts-stateful-kuard
+          - step: *test-scopes-kuard-helm-charts-stateless-kuard
           - step: *validate-scopes-kuard-terraform-modules-kuard
           - step: *test-scopes-kuard-terraform-submodules-helm-release
           - step: *test-scopes-kuard-terraform-submodules-kuard
@@ -803,7 +828,8 @@ pipelines:
           - step: *publish-scopes-core-terraform-submodules-gke-platform
           - step: *publish-scopes-core-terraform-submodules-gke-service-account
           - step: *publish-scopes-kuard-docker-images-kuard
-          - step: *publish-scopes-kuard-helm-charts-kuard
+          - step: *publish-scopes-kuard-helm-charts-stateful-kuard
+          - step: *publish-scopes-kuard-helm-charts-stateless-kuard
           - step: *publish-scopes-kuard-terraform-submodules-helm-release
           - step: *publish-scopes-kuard-terraform-submodules-kuard
           - step: *publish-scopes-o11y-terraform-submodules-gcp-availability-monitor
