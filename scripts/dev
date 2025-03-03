@@ -8,7 +8,7 @@ function main {
   case "${cmd}" in
   "stop")
     log::info "destroying test node pool"
-    gcloud --quiet container node-pools delete "gogke-test-7" --location="europe-central2-a" --cluster="gogke-test-7" --project="gogke-test-0" || true
+    gcloud --quiet container node-pools delete "gogke-test-8" --location="europe-central2-a" --cluster="gogke-test-8" --project="gogke-test-0" || true
 
     log::info "done"
     ;;

@@ -20,17 +20,17 @@ resource "google_project" "this" {
   auto_create_network = false
 }
 
-resource "google_project_service" "this" {
+resource "google_project_service" "this" { # console.cloud.google.com/apis/dashboard
   project = google_project.this.project_id
 
   for_each = var.services
   service  = each.key
 }
 
-resource "google_compute_project_default_network_tier" "this" {
+resource "google_compute_project_default_network_tier" "this" { # console.cloud.google.com/net-tier/tiers/details
   project = google_project.this.project_id
 
-  network_tier = "PREMIUM"
+  network_tier = "STANDARD"
 }
 
 resource "google_project_iam_member" "viewers" {

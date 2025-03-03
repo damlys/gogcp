@@ -73,7 +73,7 @@ module "private_docker_images_registry" {
   registry_name  = "private-docker-images"
 
   iam_readers = [
-    "serviceAccount:gogke-test-7-gke-node@gogke-test-0.iam.gserviceaccount.com",
+    "serviceAccount:gogke-test-8-gke-node@gogke-test-0.iam.gserviceaccount.com",
   ]
   iam_writers = [
     "serviceAccount:gha-damlys-gogcp@gogke-main-0.iam.gserviceaccount.com",

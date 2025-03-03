@@ -42,10 +42,10 @@ $ gcloud auth print-access-token | helm registry login --username="oauth2accesst
 
 ## Kubernetes clusters
 
-- [gke_gogke-test-0_europe-central2-a_gogke-test-7](https://console.cloud.google.com/kubernetes/clusters/details/europe-central2-a/gogke-test-7/details?project=gogke-test-0)
+- [gke_gogke-test-0_europe-central2-a_gogke-test-8](https://console.cloud.google.com/kubernetes/clusters/details/europe-central2-a/gogke-test-8/details?project=gogke-test-0)
 
 ```
-$ gcloud --project="gogke-test-0" container clusters --region="europe-central2-a" get-credentials "gogke-test-7"
-$ kubectl config set-context "gke_gogke-test-0_europe-central2-a_gogke-test-7"
+$ gcloud --project="gogke-test-0" container clusters --region="europe-central2-a" get-credentials "gogke-test-8"
+$ kubectl config set-context "gke_gogke-test-0_europe-central2-a_gogke-test-8"
 $ kubectl config set-context --current --namespace="gomod-test-9"
 ```
