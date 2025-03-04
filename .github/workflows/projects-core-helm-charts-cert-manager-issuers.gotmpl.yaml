@@ -1,0 +1,47 @@
+name: projects/core/helm-charts/cert-manager-issuers
+on:
+  pull_request:
+    paths:
+      - "projects/core/helm-charts/cert-manager-issuers/**"
+      - "!projects/core/helm-charts/cert-manager-issuers/README.md"
+  push:
+    branches:
+      - main
+    paths:
+      - "projects/core/helm-charts/cert-manager-issuers/**"
+      - "!projects/core/helm-charts/cert-manager-issuers/README.md"
+jobs:
+  projects-core-helm-charts-cert-manager-issuers:
+    name: projects/core/helm-charts/cert-manager-issuers
+    runs-on: ubuntu-24.04
+    container: ghcr.io/damlys/gogcp-devcontainer:0.2.0
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      HELM_EXPERIMENTAL_OCI: 1
+    steps:
+      - name: git clone
+        uses: actions/checkout@v4
+      - name: git clone fix
+        run: git config --system --add safe.directory /__w/gorun/gorun
+      - name: gcloud auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+          create_credentials_file: true
+          cleanup_credentials: true
+      - name: helm auth (Google Artifact Registry)
+        run: gcloud auth print-access-token | helm registry login --username="oauth2accesstoken" --password-stdin "europe-central2-docker.pkg.dev"
+      - name: build
+        run: ./scripts/helm-chart build "projects/core/helm-charts/cert-manager-issuers"
+      - name: test
+        run: ./scripts/helm-chart test "projects/core/helm-charts/cert-manager-issuers"
+      - if: github.event_name == 'pull_request' && github.ref == 'refs/heads/main'
+        name: pre-publish
+        run: ./scripts/helm-chart pre-publish "projects/core/helm-charts/cert-manager-issuers"
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        name: publish
+        run: ./scripts/helm-chart publish "projects/core/helm-charts/cert-manager-issuers"
+      - name: show
+        run: ./scripts/helm-chart show "projects/core/helm-charts/cert-manager-issuers"

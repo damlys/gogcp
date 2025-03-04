@@ -81,7 +81,7 @@ data "kubernetes_service" "grafana" {
 }
 
 module "grafana_gateway_route" {
-  source = "../../../core/terraform-submodules/gke-gateway-route" # "gcs::https://www.googleapis.com/storage/v1/gogke-main-0-private-terraform-modules/gogke/core/gke-gateway-route/0.2.0.zip"
+  source = "../../../core/terraform-submodules/k8s-gateway-route" # "gcs::https://www.googleapis.com/storage/v1/gogke-main-0-private-terraform-modules/gogke/core/k8s-gateway-route/0.2.0.zip"
 
   kubernetes_service = data.kubernetes_service.grafana
 

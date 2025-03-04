@@ -185,7 +185,7 @@ resource "google_container_cluster" "this" { # console.cloud.google.com/kubernet
     network_policy_config { disabled = false }
   }
   vertical_pod_autoscaling { enabled = true }
-  gateway_api_config { channel = "CHANNEL_STANDARD" }
+  gateway_api_config { channel = "CHANNEL_DISABLED" }
   network_policy { enabled = true }
 
   # do not create default node pool
@@ -259,100 +259,89 @@ resource "google_container_node_pool" "this" {
 }
 
 #######################################
-### Workspaces
+### cert-manager
 #######################################
 
-resource "kubernetes_namespace" "this" {
+resource "kubernetes_namespace" "cert_manager" {
   depends_on = [
     google_container_cluster.this,
   ]
-  for_each = local.all_namespace_names
 
   metadata {
-    name = each.value
-  }
-
-  lifecycle {
-    ignore_changes = [
-      metadata[0].labels,
-    ]
+    name = "cert-manager"
   }
 }
 
-resource "google_project_iam_member" "cluster_viewers" {
-  for_each = local.all_iam_namespace_members
+resource "helm_release" "cert_manager" {
+  repository = "oci://europe-central2-docker.pkg.dev/gogke-main-0/external-helm-charts/gogcp"
+  chart      = "cert-manager"
+  version    = "v1.16.3"
 
-  project = var.google_project.project_id
-  role    = "roles/container.clusterViewer"
-  member  = each.value
+  name      = "cert-manager"
+  namespace = kubernetes_namespace.cert_manager.metadata[0].name
+  values    = [file("${path.module}/assets/cert_manager.yaml")]
 }
 
-resource "kubernetes_cluster_role_binding" "cluster_viewers" {
-  metadata {
-    name = "custom:cluster-viewers"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.cluster_viewer.metadata[0].name
-  }
-  dynamic "subject" {
-    for_each = local.all_iam_namespace_members
+resource "helm_release" "cert_manager_issuers" {
+  depends_on = [
+    helm_release.cert_manager,
+  ]
 
-    content {
-      api_group = "rbac.authorization.k8s.io"
-      kind      = startswith(subject.value, "user:") ? "User" : startswith(subject.value, "group:") ? "Group" : startswith(subject.value, "serviceAccount:") ? "User" : null
-      name      = split(":", subject.value)[1]
-      namespace = kubernetes_namespace.gke_security_groups.metadata[0].name
+  # repository = "oci://europe-central2-docker.pkg.dev/gogke-main-0/private-helm-charts/gogke/core"
+  chart = "../../helm-charts/cert-manager-issuers" # "cert-manager-issuers"
+  # version = "0.2.0"
+
+  name      = "cert-manager-issuers"
+  namespace = kubernetes_namespace.cert_manager.metadata[0].name
+}
+
+#######################################
+### Istio
+#######################################
+
+resource "kubernetes_namespace" "istio_system" {
+  metadata {
+    name = "istio-system"
+  }
+}
+
+resource "helm_release" "istio_base" {
+  repository = "oci://europe-central2-docker.pkg.dev/gogke-main-0/external-helm-charts/gogcp"
+  chart      = "base"
+  version    = "1.24.2"
+
+  name      = "istio-base"
+  namespace = kubernetes_namespace.istio_system.metadata[0].name
+  values    = [file("${path.module}/assets/istio_base.yaml")]
+}
+
+resource "helm_release" "istiod" {
+  repository = "oci://europe-central2-docker.pkg.dev/gogke-main-0/external-helm-charts/gogcp"
+  chart      = "istiod"
+  version    = "1.24.2"
+
+  name      = "istiod"
+  namespace = kubernetes_namespace.istio_system.metadata[0].name
+
+  values = [templatefile("${path.module}/assets/istiod.yaml.tftpl", {
+    opentelemetry_service = module.test_otel_collectors.otlp_grpc_host
+    opentelemetry_port    = module.test_otel_collectors.otlp_grpc_port
+  })]
+}
+
+resource "kubernetes_manifest" "istio_telemetry_mesh_default" {
+  depends_on = [
+    helm_release.istiod,
+  ]
+
+  manifest = {
+    apiVersion = "telemetry.istio.io/v1"
+    kind       = "Telemetry" # https://istio.io/latest/docs/reference/config/telemetry/
+    metadata = {
+      name      = "mesh-default"
+      namespace = kubernetes_namespace.istio_system.metadata[0].name
     }
-  }
-}
-
-resource "kubernetes_role_binding" "namespace_testers" {
-  for_each = var.iam_namespace_testers
-
-  metadata {
-    namespace = kubernetes_namespace.this[each.key].metadata[0].name
-    name      = "custom:namespace-testers"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.namespace_tester.metadata[0].name
-  }
-  dynamic "subject" {
-    for_each = each.value
-
-    content {
-      api_group = "rbac.authorization.k8s.io"
-      kind      = startswith(subject.value, "user:") ? "User" : startswith(subject.value, "group:") ? "Group" : startswith(subject.value, "serviceAccount:") ? "User" : null
-      name      = split(":", subject.value)[1]
-      namespace = kubernetes_namespace.gke_security_groups.metadata[0].name
-    }
-  }
-}
-
-resource "kubernetes_role_binding" "namespace_developers" {
-  for_each = var.iam_namespace_developers
-
-  metadata {
-    namespace = kubernetes_namespace.this[each.key].metadata[0].name
-    name      = "custom:namespace-developers"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.namespace_developer.metadata[0].name
-  }
-  dynamic "subject" {
-    for_each = each.value
-
-    content {
-      api_group = "rbac.authorization.k8s.io"
-      kind      = startswith(subject.value, "user:") ? "User" : startswith(subject.value, "group:") ? "Group" : startswith(subject.value, "serviceAccount:") ? "User" : null
-      name      = split(":", subject.value)[1]
-      namespace = kubernetes_namespace.gke_security_groups.metadata[0].name
-    }
+    spec = yamldecode(file("${path.module}/assets/istio_telemetry_mesh_default.yaml"))
   }
 }
 
@@ -532,6 +521,208 @@ resource "kubernetes_manifest" "gke_gateway_redirect_http_to_https" {
           }
         }]
       }]
+    }
+  }
+}
+
+#######################################
+### Prometheus Operator (CRDs)
+#######################################
+
+resource "kubernetes_namespace" "prometheus_operator" {
+  depends_on = [
+    google_container_cluster.this,
+  ]
+
+  metadata {
+    name = "prometheus-operator"
+  }
+}
+
+resource "helm_release" "prometheus_operator_crds" {
+  repository = "oci://europe-central2-docker.pkg.dev/gogke-main-0/external-helm-charts/gogcp"
+  chart      = "prometheus-operator-crds"
+  version    = "17.0.2"
+
+  name      = "prometheus-operator-crds"
+  namespace = kubernetes_namespace.prometheus_operator.metadata[0].name
+}
+
+#######################################
+### OpenTelemetry Operator
+#######################################
+
+resource "kubernetes_namespace" "opentelemetry_operator" {
+  depends_on = [
+    google_container_cluster.this,
+  ]
+
+  metadata {
+    name = "opentelemetry-operator"
+  }
+}
+
+resource "helm_release" "opentelemetry_operator" {
+  depends_on = [
+    helm_release.cert_manager,
+  ]
+
+  repository = "oci://europe-central2-docker.pkg.dev/gogke-main-0/external-helm-charts/gogcp"
+  chart      = "opentelemetry-operator"
+  version    = "0.76.0"
+
+  name      = "opentelemetry-operator"
+  namespace = kubernetes_namespace.opentelemetry_operator.metadata[0].name
+  values    = [file("${path.module}/assets/opentelemetry_operator.yaml")]
+}
+
+# https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/k8sattributesprocessor/README.md#role-based-access-control
+resource "kubernetes_cluster_role" "opentelemetry_collector" {
+  metadata {
+    name = "opentelemetry-collector"
+  }
+  rule {
+    api_groups = [""]
+    resources  = ["pods", "namespaces", "nodes"]
+    verbs      = ["get", "list", "watch"]
+  }
+  rule {
+    api_groups = ["apps"]
+    resources  = ["deployments", "replicasets", "statefulsets", "daemonsets"]
+    verbs      = ["get", "list", "watch"]
+  }
+  rule {
+    api_groups = ["batch"]
+    resources  = ["jobs", "cronjobs"]
+    verbs      = ["get", "list", "watch"]
+  }
+}
+
+# https://github.com/open-telemetry/opentelemetry-operator/tree/main/cmd/otel-allocator#rbac
+resource "kubernetes_cluster_role" "opentelemetry_targetallocator" {
+  metadata {
+    name = "opentelemetry-targetallocator"
+  }
+  rule {
+    api_groups = [""]
+    resources  = ["configmaps", "endpoints", "namespaces", "nodes", "nodes/metrics", "pods", "serviceaccounts", "services"]
+    verbs      = ["get", "list", "watch"]
+  }
+  rule {
+    api_groups = ["discovery.k8s.io"]
+    resources  = ["endpointslices"]
+    verbs      = ["get", "list", "watch"]
+  }
+  rule {
+    api_groups = ["networking.k8s.io"]
+    resources  = ["ingresses"]
+    verbs      = ["get", "list", "watch"]
+  }
+  rule {
+    api_groups = ["monitoring.coreos.com"]
+    resources  = ["servicemonitors", "podmonitors", "probes", "scrapeconfigs"]
+    verbs      = ["*"]
+  }
+  rule {
+    non_resource_urls = ["/metrics"]
+    verbs             = ["get"]
+  }
+}
+
+#######################################
+### Workspaces
+#######################################
+
+resource "kubernetes_namespace" "this" {
+  depends_on = [
+    google_container_cluster.this,
+  ]
+  for_each = local.all_namespace_names
+
+  metadata {
+    name = each.value
+  }
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].labels,
+    ]
+  }
+}
+
+resource "google_project_iam_member" "cluster_viewers" {
+  for_each = local.all_iam_namespace_members
+
+  project = var.google_project.project_id
+  role    = "roles/container.clusterViewer"
+  member  = each.value
+}
+
+resource "kubernetes_cluster_role_binding" "cluster_viewers" {
+  metadata {
+    name = "custom:cluster-viewers"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.cluster_viewer.metadata[0].name
+  }
+  dynamic "subject" {
+    for_each = local.all_iam_namespace_members
+
+    content {
+      api_group = "rbac.authorization.k8s.io"
+      kind      = startswith(subject.value, "user:") ? "User" : startswith(subject.value, "group:") ? "Group" : startswith(subject.value, "serviceAccount:") ? "User" : null
+      name      = split(":", subject.value)[1]
+      namespace = kubernetes_namespace.gke_security_groups.metadata[0].name
+    }
+  }
+}
+
+resource "kubernetes_role_binding" "namespace_testers" {
+  for_each = var.iam_namespace_testers
+
+  metadata {
+    namespace = kubernetes_namespace.this[each.key].metadata[0].name
+    name      = "custom:namespace-testers"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.namespace_tester.metadata[0].name
+  }
+  dynamic "subject" {
+    for_each = each.value
+
+    content {
+      api_group = "rbac.authorization.k8s.io"
+      kind      = startswith(subject.value, "user:") ? "User" : startswith(subject.value, "group:") ? "Group" : startswith(subject.value, "serviceAccount:") ? "User" : null
+      name      = split(":", subject.value)[1]
+      namespace = kubernetes_namespace.gke_security_groups.metadata[0].name
+    }
+  }
+}
+
+resource "kubernetes_role_binding" "namespace_developers" {
+  for_each = var.iam_namespace_developers
+
+  metadata {
+    namespace = kubernetes_namespace.this[each.key].metadata[0].name
+    name      = "custom:namespace-developers"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.namespace_developer.metadata[0].name
+  }
+  dynamic "subject" {
+    for_each = each.value
+
+    content {
+      api_group = "rbac.authorization.k8s.io"
+      kind      = startswith(subject.value, "user:") ? "User" : startswith(subject.value, "group:") ? "Group" : startswith(subject.value, "serviceAccount:") ? "User" : null
+      name      = split(":", subject.value)[1]
+      namespace = kubernetes_namespace.gke_security_groups.metadata[0].name
     }
   }
 }

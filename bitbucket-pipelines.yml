@@ -9,10 +9,10 @@ definitions:
     projects-core-terraform-submodules-gcp-project: projects/core/terraform-submodules/gcp-project/.terraform
     projects-core-terraform-submodules-gcp-terraform-modules-registry: projects/core/terraform-submodules/gcp-terraform-modules-registry/.terraform
     projects-core-terraform-submodules-gcp-terraform-state-bucket: projects/core/terraform-submodules/gcp-terraform-state-bucket/.terraform
-    projects-core-terraform-submodules-gke-gateway-redirect: projects/core/terraform-submodules/gke-gateway-redirect/.terraform
-    projects-core-terraform-submodules-gke-gateway-route: projects/core/terraform-submodules/gke-gateway-route/.terraform
     projects-core-terraform-submodules-gke-platform: projects/core/terraform-submodules/gke-platform/.terraform
     projects-core-terraform-submodules-gke-service-account: projects/core/terraform-submodules/gke-service-account/.terraform
+    projects-core-terraform-submodules-k8s-gateway-redirect: projects/core/terraform-submodules/k8s-gateway-redirect/.terraform
+    projects-core-terraform-submodules-k8s-gateway-route: projects/core/terraform-submodules/k8s-gateway-route/.terraform
     projects-kuard-terraform-modules-kuard: projects/kuard/terraform-modules/kuard/.terraform
     projects-kuard-terraform-submodules-helm-release: projects/kuard/terraform-submodules/helm-release/.terraform
     projects-kuard-terraform-submodules-kuard: projects/kuard/terraform-submodules/kuard/.terraform
@@ -124,6 +124,30 @@ definitions:
           - ./scripts/docker-image test "projects/core/docker-images/go-sdk"
           - ./scripts/docker-image publish "projects/core/docker-images/go-sdk"
           - ./scripts/docker-image show "projects/core/docker-images/go-sdk"
+    - step: &test-projects-core-helm-charts-cert-manager-issuers
+        name: test projects/core/helm-charts/cert-manager-issuers
+        condition:
+          changesets:
+            includePaths:
+              - "projects/core/helm-charts/cert-manager-issuers/**"
+        script:
+          - *auth
+          - ./scripts/helm-chart build "projects/core/helm-charts/cert-manager-issuers"
+          - ./scripts/helm-chart test "projects/core/helm-charts/cert-manager-issuers"
+          - ./scripts/helm-chart pre-publish "projects/core/helm-charts/cert-manager-issuers"
+          - ./scripts/helm-chart show "projects/core/helm-charts/cert-manager-issuers"
+    - step: &publish-projects-core-helm-charts-cert-manager-issuers
+        name: publish projects/core/helm-charts/cert-manager-issuers
+        condition:
+          changesets:
+            includePaths:
+              - "projects/core/helm-charts/cert-manager-issuers/**"
+        script:
+          - *auth
+          - ./scripts/helm-chart build "projects/core/helm-charts/cert-manager-issuers"
+          - ./scripts/helm-chart test "projects/core/helm-charts/cert-manager-issuers"
+          - ./scripts/helm-chart publish "projects/core/helm-charts/cert-manager-issuers"
+          - ./scripts/helm-chart show "projects/core/helm-charts/cert-manager-issuers"
     - step: &validate-projects-core-terraform-modules-main
         name: validate projects/core/terraform-modules/main
         condition:
@@ -372,62 +396,6 @@ definitions:
           - ./scripts/terraform-submodule test "projects/core/terraform-submodules/gcp-terraform-state-bucket"
           - ./scripts/terraform-submodule publish "projects/core/terraform-submodules/gcp-terraform-state-bucket"
           - ./scripts/terraform-submodule show "projects/core/terraform-submodules/gcp-terraform-state-bucket"
-    - step: &test-projects-core-terraform-submodules-gke-gateway-redirect
-        name: test projects/core/terraform-submodules/gke-gateway-redirect
-        condition:
-          changesets:
-            includePaths:
-              - "projects/core/terraform-submodules/gke-gateway-redirect/**"
-        caches:
-          - projects-core-terraform-submodules-gke-gateway-redirect
-        script:
-          - *auth
-          - ./scripts/terraform-submodule build "projects/core/terraform-submodules/gke-gateway-redirect"
-          - ./scripts/terraform-submodule test "projects/core/terraform-submodules/gke-gateway-redirect"
-          - ./scripts/terraform-submodule pre-publish "projects/core/terraform-submodules/gke-gateway-redirect"
-          - ./scripts/terraform-submodule show "projects/core/terraform-submodules/gke-gateway-redirect"
-    - step: &publish-projects-core-terraform-submodules-gke-gateway-redirect
-        name: publish projects/core/terraform-submodules/gke-gateway-redirect
-        condition:
-          changesets:
-            includePaths:
-              - "projects/core/terraform-submodules/gke-gateway-redirect/**"
-        caches:
-          - projects-core-terraform-submodules-gke-gateway-redirect
-        script:
-          - *auth
-          - ./scripts/terraform-submodule build "projects/core/terraform-submodules/gke-gateway-redirect"
-          - ./scripts/terraform-submodule test "projects/core/terraform-submodules/gke-gateway-redirect"
-          - ./scripts/terraform-submodule publish "projects/core/terraform-submodules/gke-gateway-redirect"
-          - ./scripts/terraform-submodule show "projects/core/terraform-submodules/gke-gateway-redirect"
-    - step: &test-projects-core-terraform-submodules-gke-gateway-route
-        name: test projects/core/terraform-submodules/gke-gateway-route
-        condition:
-          changesets:
-            includePaths:
-              - "projects/core/terraform-submodules/gke-gateway-route/**"
-        caches:
-          - projects-core-terraform-submodules-gke-gateway-route
-        script:
-          - *auth
-          - ./scripts/terraform-submodule build "projects/core/terraform-submodules/gke-gateway-route"
-          - ./scripts/terraform-submodule test "projects/core/terraform-submodules/gke-gateway-route"
-          - ./scripts/terraform-submodule pre-publish "projects/core/terraform-submodules/gke-gateway-route"
-          - ./scripts/terraform-submodule show "projects/core/terraform-submodules/gke-gateway-route"
-    - step: &publish-projects-core-terraform-submodules-gke-gateway-route
-        name: publish projects/core/terraform-submodules/gke-gateway-route
-        condition:
-          changesets:
-            includePaths:
-              - "projects/core/terraform-submodules/gke-gateway-route/**"
-        caches:
-          - projects-core-terraform-submodules-gke-gateway-route
-        script:
-          - *auth
-          - ./scripts/terraform-submodule build "projects/core/terraform-submodules/gke-gateway-route"
-          - ./scripts/terraform-submodule test "projects/core/terraform-submodules/gke-gateway-route"
-          - ./scripts/terraform-submodule publish "projects/core/terraform-submodules/gke-gateway-route"
-          - ./scripts/terraform-submodule show "projects/core/terraform-submodules/gke-gateway-route"
     - step: &test-projects-core-terraform-submodules-gke-platform
         name: test projects/core/terraform-submodules/gke-platform
         condition:
@@ -484,6 +452,62 @@ definitions:
           - ./scripts/terraform-submodule test "projects/core/terraform-submodules/gke-service-account"
           - ./scripts/terraform-submodule publish "projects/core/terraform-submodules/gke-service-account"
           - ./scripts/terraform-submodule show "projects/core/terraform-submodules/gke-service-account"
+    - step: &test-projects-core-terraform-submodules-k8s-gateway-redirect
+        name: test projects/core/terraform-submodules/k8s-gateway-redirect
+        condition:
+          changesets:
+            includePaths:
+              - "projects/core/terraform-submodules/k8s-gateway-redirect/**"
+        caches:
+          - projects-core-terraform-submodules-k8s-gateway-redirect
+        script:
+          - *auth
+          - ./scripts/terraform-submodule build "projects/core/terraform-submodules/k8s-gateway-redirect"
+          - ./scripts/terraform-submodule test "projects/core/terraform-submodules/k8s-gateway-redirect"
+          - ./scripts/terraform-submodule pre-publish "projects/core/terraform-submodules/k8s-gateway-redirect"
+          - ./scripts/terraform-submodule show "projects/core/terraform-submodules/k8s-gateway-redirect"
+    - step: &publish-projects-core-terraform-submodules-k8s-gateway-redirect
+        name: publish projects/core/terraform-submodules/k8s-gateway-redirect
+        condition:
+          changesets:
+            includePaths:
+              - "projects/core/terraform-submodules/k8s-gateway-redirect/**"
+        caches:
+          - projects-core-terraform-submodules-k8s-gateway-redirect
+        script:
+          - *auth
+          - ./scripts/terraform-submodule build "projects/core/terraform-submodules/k8s-gateway-redirect"
+          - ./scripts/terraform-submodule test "projects/core/terraform-submodules/k8s-gateway-redirect"
+          - ./scripts/terraform-submodule publish "projects/core/terraform-submodules/k8s-gateway-redirect"
+          - ./scripts/terraform-submodule show "projects/core/terraform-submodules/k8s-gateway-redirect"
+    - step: &test-projects-core-terraform-submodules-k8s-gateway-route
+        name: test projects/core/terraform-submodules/k8s-gateway-route
+        condition:
+          changesets:
+            includePaths:
+              - "projects/core/terraform-submodules/k8s-gateway-route/**"
+        caches:
+          - projects-core-terraform-submodules-k8s-gateway-route
+        script:
+          - *auth
+          - ./scripts/terraform-submodule build "projects/core/terraform-submodules/k8s-gateway-route"
+          - ./scripts/terraform-submodule test "projects/core/terraform-submodules/k8s-gateway-route"
+          - ./scripts/terraform-submodule pre-publish "projects/core/terraform-submodules/k8s-gateway-route"
+          - ./scripts/terraform-submodule show "projects/core/terraform-submodules/k8s-gateway-route"
+    - step: &publish-projects-core-terraform-submodules-k8s-gateway-route
+        name: publish projects/core/terraform-submodules/k8s-gateway-route
+        condition:
+          changesets:
+            includePaths:
+              - "projects/core/terraform-submodules/k8s-gateway-route/**"
+        caches:
+          - projects-core-terraform-submodules-k8s-gateway-route
+        script:
+          - *auth
+          - ./scripts/terraform-submodule build "projects/core/terraform-submodules/k8s-gateway-route"
+          - ./scripts/terraform-submodule test "projects/core/terraform-submodules/k8s-gateway-route"
+          - ./scripts/terraform-submodule publish "projects/core/terraform-submodules/k8s-gateway-route"
+          - ./scripts/terraform-submodule show "projects/core/terraform-submodules/k8s-gateway-route"
     - step: &test-projects-kuard-docker-images-kuard
         name: test projects/kuard/docker-images/kuard
         condition:
@@ -784,6 +808,7 @@ pipelines:
           - step: *test-projects-core-docker-images-devcontainer
           - step: *test-projects-core-docker-images-go-rte
           - step: *test-projects-core-docker-images-go-sdk
+          - step: *test-projects-core-helm-charts-cert-manager-issuers
           - step: *validate-projects-core-terraform-modules-main
           - step: *validate-projects-core-terraform-modules-prod
           - step: *validate-projects-core-terraform-modules-test
@@ -792,10 +817,10 @@ pipelines:
           - step: *test-projects-core-terraform-submodules-gcp-project
           - step: *test-projects-core-terraform-submodules-gcp-terraform-modules-registry
           - step: *test-projects-core-terraform-submodules-gcp-terraform-state-bucket
-          - step: *test-projects-core-terraform-submodules-gke-gateway-redirect
-          - step: *test-projects-core-terraform-submodules-gke-gateway-route
           - step: *test-projects-core-terraform-submodules-gke-platform
           - step: *test-projects-core-terraform-submodules-gke-service-account
+          - step: *test-projects-core-terraform-submodules-k8s-gateway-redirect
+          - step: *test-projects-core-terraform-submodules-k8s-gateway-route
           - step: *test-projects-kuard-docker-images-kuard
           - step: *test-projects-kuard-helm-charts-stateful-kuard
           - step: *test-projects-kuard-helm-charts-stateless-kuard
@@ -818,15 +843,16 @@ pipelines:
           - step: *publish-projects-core-docker-images-devcontainer
           - step: *publish-projects-core-docker-images-go-rte
           - step: *publish-projects-core-docker-images-go-sdk
+          - step: *publish-projects-core-helm-charts-cert-manager-issuers
           - step: *publish-projects-core-terraform-submodules-gcp-docker-images-registry
           - step: *publish-projects-core-terraform-submodules-gcp-helm-charts-registry
           - step: *publish-projects-core-terraform-submodules-gcp-project
           - step: *publish-projects-core-terraform-submodules-gcp-terraform-modules-registry
           - step: *publish-projects-core-terraform-submodules-gcp-terraform-state-bucket
-          - step: *publish-projects-core-terraform-submodules-gke-gateway-redirect
-          - step: *publish-projects-core-terraform-submodules-gke-gateway-route
           - step: *publish-projects-core-terraform-submodules-gke-platform
           - step: *publish-projects-core-terraform-submodules-gke-service-account
+          - step: *publish-projects-core-terraform-submodules-k8s-gateway-redirect
+          - step: *publish-projects-core-terraform-submodules-k8s-gateway-route
           - step: *publish-projects-kuard-docker-images-kuard
           - step: *publish-projects-kuard-helm-charts-stateful-kuard
           - step: *publish-projects-kuard-helm-charts-stateless-kuard

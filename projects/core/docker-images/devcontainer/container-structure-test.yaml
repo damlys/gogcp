@@ -25,6 +25,12 @@ commandTests:
 
   # Cloud Native
 
+  - # https://cert-manager.io/docs/reference/cmctl/
+    name: cmctl
+    command: cmctl
+    args:
+      - version
+      - --client
   - # https://github.com/GoogleContainerTools/container-structure-test
     name: container-structure-test
     command: container-structure-test
@@ -217,6 +223,9 @@ commandTests:
 #######################################
 
 fileExistenceTests:
+  - name: cmctl shell completion
+    path: /etc/bash_completion.d/cmctl
+    shouldExist: true
   - name: docker shell completion
     path: /usr/share/bash-completion/completions/docker
     shouldExist: true

@@ -76,6 +76,11 @@ go install golang.org/x/tools/cmd/gonew@latest
 go install golang.org/x/tools/gopls@latest
 go install golang.org/x/vuln/cmd/govulncheck@latest
 
+# cmctl: https://github.com/cert-manager/cmctl/releases
+cmctl_version="2.1.1"
+wget https://github.com/cert-manager/cmctl/releases/download/v${cmctl_version}/cmctl_${TARGETOS}_${TARGETARCH} \
+  --output-document=/usr/local/bin/cmctl
+
 # container-structure-test: https://github.com/GoogleContainerTools/container-structure-test/releases
 cst_version="1.19.3"
 wget https://github.com/GoogleContainerTools/container-structure-test/releases/download/v${cst_version}/container-structure-test-${TARGETOS}-${TARGETARCH} \
@@ -127,6 +132,7 @@ wget https://github.com/mikefarah/yq/releases/download/v${yq_version}/yq_${TARGE
 chmod a+x /usr/local/bin/*
 
 # shell completions
+cmctl completion bash >/etc/bash_completion.d/cmctl
 gh completion -s bash >/etc/bash_completion.d/gh
 golangci-lint completion bash >/etc/bash_completion.d/golangci-lint
 goreleaser completion bash >/etc/bash_completion.d/goreleaser

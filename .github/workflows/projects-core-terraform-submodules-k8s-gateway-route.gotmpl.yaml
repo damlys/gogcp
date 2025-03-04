@@ -1,0 +1,52 @@
+name: projects/core/terraform-submodules/k8s-gateway-route
+on:
+  pull_request:
+    paths:
+      - "projects/core/terraform-submodules/k8s-gateway-route/**"
+      - "!projects/core/terraform-submodules/k8s-gateway-route/README.md"
+  push:
+    branches:
+      - main
+    paths:
+      - "projects/core/terraform-submodules/k8s-gateway-route/**"
+      - "!projects/core/terraform-submodules/k8s-gateway-route/README.md"
+jobs:
+  projects-core-terraform-submodules-k8s-gateway-route:
+    name: projects/core/terraform-submodules/k8s-gateway-route
+    runs-on: ubuntu-24.04
+    container: ghcr.io/damlys/gogcp-devcontainer:0.2.0
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      TF_IN_AUTOMATION: 1
+    steps:
+      - name: git clone
+        uses: actions/checkout@v4
+      - name: git clone fix
+        run: git config --system --add safe.directory /__w/gorun/gorun
+      - name: gcloud auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+          create_credentials_file: true
+          cleanup_credentials: true
+      - name: cache
+        uses: actions/cache@v4
+        with:
+          key: projects-core-terraform-submodules-k8s-gateway-route
+          path: |
+            projects/core/terraform-submodules/k8s-gateway-route/.terraform
+            projects/core/terraform-submodules/k8s-gateway-route/.terraform.lock.hcl
+      - name: build
+        run: ./scripts/terraform-submodule build "projects/core/terraform-submodules/k8s-gateway-route"
+      - name: test
+        run: ./scripts/terraform-submodule test "projects/core/terraform-submodules/k8s-gateway-route"
+      - if: github.event_name == 'pull_request' && github.ref == 'refs/heads/main'
+        name: pre-publish
+        run: ./scripts/terraform-submodule pre-publish "projects/core/terraform-submodules/k8s-gateway-route"
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        name: publish
+        run: ./scripts/terraform-submodule publish "projects/core/terraform-submodules/k8s-gateway-route"
+      - name: show
+        run: ./scripts/terraform-submodule show "projects/core/terraform-submodules/k8s-gateway-route"

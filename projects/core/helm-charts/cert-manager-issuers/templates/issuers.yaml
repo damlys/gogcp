@@ -1,0 +1,32 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer # https://cert-manager.io/docs/reference/api-docs/#cert-manager.io/v1.ClusterIssuer
+metadata:
+  name: letsencrypt-production
+  labels:
+    {{- include "cert-manager-issuers.metadataLabels" $ | nindent 4 }}
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: {{ .Values.email | quote }}
+    privateKeySecretRef:
+      name: letsencrypt-production-issuer-account-key
+    solvers:
+      - http01:
+          {{- include "cert-manager-issuers.httpSolver" $ | nindent 10 }}
+
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+  labels:
+    {{- include "cert-manager-issuers.metadataLabels" $ | nindent 4 }}
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: {{ .Values.email | quote }}
+    privateKeySecretRef:
+      name: letsencrypt-staging-issuer-account-key
+    solvers:
+      - http01:
+          {{- include "cert-manager-issuers.httpSolver" $ | nindent 10 }}

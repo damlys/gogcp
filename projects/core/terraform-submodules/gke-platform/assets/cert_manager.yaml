@@ -1,6 +1,9 @@
 crds:
   enabled: true
 
+extraArgs:
+  - --enable-gateway-api
+
 prometheus:
   enabled: true
   servicemonitor:
