@@ -5,6 +5,9 @@ dependencies:
 - name: cert-manager
   repository: https://charts.jetstack.io
   version: v1.16.3
+- name: external-dns
+  repository: https://kubernetes-sigs.github.io/external-dns
+  version: 1.15.2
 - name: grafana
   repository: https://grafana.github.io/helm-charts
   version: 8.8.2
@@ -32,5 +35,5 @@ dependencies:
 - name: tempo-distributed
   repository: https://grafana.github.io/helm-charts
   version: 1.28.0
-digest: sha256:5564f46d43c80c310b0059d213064f00616a75cfc8e1105875bd16dac264403b
-generated: "2025-01-25T11:58:49.51782425Z"
+digest: sha256:0b353dd1a2d5948e8f59f72f5c9b34b5490b4795630646f9c6998e1ea6230dd2
+generated: "2025-03-04T09:31:49.816414Z"
