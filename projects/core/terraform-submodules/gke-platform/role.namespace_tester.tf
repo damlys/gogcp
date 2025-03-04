@@ -73,8 +73,23 @@ resource "kubernetes_cluster_role" "namespace_tester" {
     verbs      = ["get", "list", "watch"]
   }
   rule {
-    api_groups = ["networking.k8s.io", "gateway.networking.k8s.io", "cloud.google.com"]
-    resources  = ["ingresses", "ingresses/status", "frontendconfigs", "backendconfigs", "lbpolicies", "lbpolicies/status", "gateways", "gateways/status", "httproutes", "httproutes/status", "healthcheckpolicies", "healthcheckpolicies/status", "gcpgatewaypolicies", "gcpgatewaypolicies/status", "gcpbackendpolicies", "gcpbackendpolicies/status"]
+    api_groups = ["networking.gke.io"]
+    resources  = []
+    verbs      = ["get", "list", "watch"]
+  }
+  rule {
+    api_groups = ["networking.k8s.io"]
+    resources  = ["ingresses", "ingresses/status"]
+    verbs      = ["get", "list", "watch"]
+  }
+  rule {
+    api_groups = ["gateway.networking.k8s.io"]
+    resources  = ["gateways", "gateways/status", "httproutes", "httproutes/status"]
+    verbs      = ["get", "list", "watch"]
+  }
+  rule {
+    api_groups = ["networking.istio.io"]
+    resources  = []
     verbs      = ["get", "list", "watch"]
   }
 }

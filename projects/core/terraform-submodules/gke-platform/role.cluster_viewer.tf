@@ -18,8 +18,13 @@ resource "kubernetes_cluster_role" "cluster_viewer" {
     verbs      = ["get", "list", "watch"]
   }
   rule {
-    api_groups = ["networking.k8s.io", "gateway.networking.k8s.io"]
-    resources  = ["ingressclasses", "gatewayclasses", "gatewayclasses/status"]
+    api_groups = ["networking.k8s.io"]
+    resources  = ["ingressclasses"]
+    verbs      = ["get", "list", "watch"]
+  }
+  rule {
+    api_groups = ["gateway.networking.k8s.io"]
+    resources  = ["gatewayclasses", "gatewayclasses/status"]
     verbs      = ["get", "list", "watch"]
   }
 }

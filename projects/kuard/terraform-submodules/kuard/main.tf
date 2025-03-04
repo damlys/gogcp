@@ -1,16 +1,3 @@
-resource "kubernetes_labels" "namespace" {
-  api_version = "v1"
-  kind        = "Namespace"
-  metadata {
-    name = var.kubernetes_namespace.metadata[0].name
-  }
-  labels = {
-    istio-injection = "disabled" # or "enabled"
-  }
-
-  force = true
-}
-
 #######################################
 ### stateless kuard
 #######################################
